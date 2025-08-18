@@ -34,9 +34,9 @@ def calculate_age():
 
 
 def calculate_chronological_age(birthdate):
-
-    # Calcula a idade cronológica em semanas e meses.
-
+    """
+    Calcula a idade cronológica em semanas e meses.
+    """
     today = date.today()
     delta = today - birthdate
     total_days = delta.days
@@ -50,35 +50,70 @@ def calculate_chronological_age(birthdate):
 def calculate_corrected_age(
     chronological_age, gestational_age_weeks, gestational_age_days
 ):
-    # Calcula a idade corrigida em semanas, meses e dias.
-
+    """
+    Calcula a idade corrigida em semanas, meses e dias.
+    """
     corrected_weeks = chronological_age["weeks"] - (40 - gestational_age_weeks)
-
     total_corrected_days = corrected_weeks * 7 + gestational_age_days
 
+    # Idade em semanas e dias
     final_weeks = total_corrected_days // 7
-    final_days = total_corrected_days % 7
-
+    final_days_in_week = total_corrected_days % 7
     corrected_months = total_corrected_days // 30  # Aproximação
 
-    return {"weeks": final_weeks, "months": corrected_months, "days": final_days}
+    # Cálculo da idade em anos, meses e dias (cálculo mais preciso)
+    today = date.today()
+    birthdate = today - timedelta(days=total_corrected_days)
+
+    # Lógica aprimorada para calcular anos, meses e dias
+    corrected_years = today.year - birthdate.year
+    corrected_months_years = today.month - birthdate.month
+    corrected_days_years = today.day - birthdate.day
+
+    if corrected_days_years < 0:
+        corrected_months_years -= 1
+        last_day_of_prev_month = (today.replace(day=1) - timedelta(days=1)).day
+        corrected_days_years += last_day_of_prev_month
+
+    if corrected_months_years < 0:
+        corrected_years -= 1
+        corrected_months_years += 12
+
+    return {
+        "weeks": final_weeks,
+        "months": corrected_months,
+        "days": final_days_in_week,
+        "years": corrected_years,
+        "months_years": corrected_months_years,
+        "days_years": corrected_days_years,
+    }
 
 
 def display_results(chronological_age, corrected_age):
-    
-    # Exibe os resultados na interface.
-    
+    """
+    Exibe os resultados na interface.
+    """
     result_text = (
         f"Idade Cronológica: {chronological_age['weeks']} semanas ({chronological_age['months']} meses)\n"
-        f"Idade Corrigida: {corrected_age['weeks']} semanas ({corrected_age['months']} meses) e {corrected_age['days']} dias"
+        f"Idade Corrigida: {corrected_age['weeks']} semanas ({corrected_age['months']} meses) e {corrected_age['days']} dias\n"
+        f"Idade Corrigida (Anos): {corrected_age['years']} anos, {corrected_age['months_years']} meses e {corrected_age['days_years']} dias"
     )
     result_var.set(result_text)
 
 
+def copy_to_clipboard():
+    """
+    Copia o texto do resultado para a área de transferência.
+    """
+    root.clipboard_clear()
+    root.clipboard_append(result_var.get())
+    root.update()
+
+
 def clear_fields():
-    
-    # Limpa os campos de entrada e o resultado.
-    
+    """
+    Limpa os campos de entrada e o resultado.
+    """
     birthdate_entry.delete(0, "end")
     gestational_age_entry.delete(0, "end")
     gestational_age_days_entry.delete(0, "end")
@@ -88,7 +123,7 @@ def clear_fields():
 # Configuração da janela principal
 root = Tk()
 root.title("Calculadora de Idade do Bebê")
-root.geometry("450x350")
+root.geometry("450x400")
 root.resizable(False, False)
 
 # Configuração dos widgets (elementos da interface)
@@ -152,9 +187,20 @@ clear_button.pack(side="left", padx=5)
 # Área de resultado
 result_var = StringVar()
 result_label = Label(
-    main_frame, textvariable=result_var, font=("Verdana", 10), justify="center"
+    main_frame, textvariable=result_var, font=("Verdana", 10), justify="left"
 )
 result_label.pack(pady=10)
+
+# Botão para copiar o resultado
+copy_button = Button(
+    main_frame,
+    text="Copiar Resultado",
+    command=copy_to_clipboard,
+    bg="#0000ff",
+    fg="#f8f7f4",
+)
+copy_button.pack(pady=10)
+
 
 # Iniciar o loop principal da interface
 root.mainloop()
