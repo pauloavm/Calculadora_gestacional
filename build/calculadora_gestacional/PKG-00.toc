@@ -2999,7 +2999,7 @@
    'DATA')],
  'python313.dll',
  False,
- True,
+ False,
  False,
  [],
  None,
