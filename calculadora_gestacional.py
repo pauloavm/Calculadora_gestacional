@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from tkinter import Tk, Label, Entry, Button, Frame, StringVar
 from datetime import date, datetime, timedelta
+import webbrowser  # Importa a biblioteca para abrir links em navegadores
 
 
 # Funções de cálculo
@@ -120,10 +121,17 @@ def clear_fields():
     result_var.set("")
 
 
+def open_linkedin():
+    """
+    Abre o link do LinkedIn no navegador padrão.
+    """
+    webbrowser.open("https://www.linkedin.com/in/paulomunhoz/")
+
+
 # Configuração da janela principal
 root = Tk()
 root.title("Calculadora de Idade do Bebê")
-root.geometry("450x400")
+root.geometry("450x450")  # Aumentei o tamanho da tela
 root.resizable(False, False)
 
 # Configuração dos widgets (elementos da interface)
@@ -200,6 +208,17 @@ copy_button = Button(
     fg="#f8f7f4",
 )
 copy_button.pack(pady=10)
+
+# Rodapé com o link para o LinkedIn
+footer_label = Label(
+    main_frame,
+    text="Desenvolvido por Paulo A V Munhoz",
+    fg="blue",
+    cursor="hand2",
+    font=("Verdana", 8, "underline"),
+)
+footer_label.pack(pady=10)
+footer_label.bind("<Button-1>", lambda e: open_linkedin())
 
 
 # Iniciar o loop principal da interface
